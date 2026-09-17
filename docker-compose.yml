@@ -45,6 +45,8 @@ services:
     volumes:
       # Live reload in development; drop this mapping for a production deploy.
       - ./app:/srv/app/app:ro
+      # Static page served at / by the API; mounted so edits need no rebuild.
+      - ./frontend:/srv/app/frontend:ro
     command:
       ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     healthcheck:

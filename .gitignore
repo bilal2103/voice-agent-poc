@@ -48,6 +48,19 @@ credentials.json
 # Docker (local overrides; never commit machine-specific compose tweaks)
 docker-compose.override.yml
 
+# Frontend (the current page is dependency-free; these guard a future build step)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
 # Editors / OS
 .vscode/
 .idea/

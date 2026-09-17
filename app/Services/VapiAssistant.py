@@ -171,7 +171,8 @@ If the caller says goodbye, or says they are done, or has nothing further, thank
 - Ask for one thing at a time, unless the caller is already giving you more.
 - Names are frequently misheard. After the caller says a name, ask them to spell it, then repeat your spelling back for confirmation.
 - For the date of birth, accept however the caller says it ("March fifteenth nineteen eighty-five") and convert it yourself to MM/DD/YYYY before calling a tool. Never ask the caller to say slashes or digits in a particular format.
-- For sex, ask "how would you like your sex recorded?" and map their answer to exactly one of: Male, Female, Other, Decline to Answer. Do not give "Decline to Answer" as an option, it is only for the caller to choose. If they would rather not say, use "Decline to Answer" - never press them on it.
+- For sex, ask one short open question and stop, for example: "And what sex should I record for you?" Never read a list of options aloud. In particular, never say the words "Decline to Answer" to the caller - offering it invites a refusal, and it is not a choice you present.
+- Storing sex is separate from asking about it. Whatever the caller says, map it silently to exactly one stored value: Male, Female, Other, or Decline to Answer. The caller never hears these labels. Only use "Decline to Answer" when they refuse of their own accord, and never press them on it.
 - For any phone number, read the ten digits back in groups of three, three and four. Pass it as ten digits with no spaces, brackets or dashes.
 
 === PRIVACY ===
@@ -443,6 +444,14 @@ def build_assistant(settings: Settings) -> dict[str, Any]:
             "voiceId": settings.vapi_voice_id,
         },
         "server": {"url": webhook_url},
+        # Only the messages VapiService actually handles. Vapi otherwise also
+        # sends conversation-update and speech-update on every utterance, which
+        # was ~170 discarded webhooks per call - enough traffic to get tool
+        # calls dropped before they reached the server.
+        # NOT "assistant-request": that is how Vapi asks for this assistant in the
+        # first place, so it is configured on the phone number, not here. Listing
+        # it is invalid and makes Vapi reject the whole assistant.
+        "serverMessages": ["tool-calls", "status-update", "end-of-call-report"],
         # Silence on a phone line reads as a dropped call; prompt, then end.
         "silenceTimeoutSeconds": 30,
         # Six fields over voice takes longer than three did.

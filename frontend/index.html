@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Patients — Healthcare Voice Agent</title>
+<style>
+  :root {
+    --bg: #fbfbfd;
+    --surface: #ffffff;
+    --border: #e6e6ec;
+    --border-strong: #d6d6e0;
+    --text: #16161d;
+    --text-muted: #6b6b7b;
+    --text-faint: #9a9aab;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --danger: #b42318;
+    --danger-soft: #fef3f2;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(16, 16, 29, 0.04), 0 4px 16px rgba(16, 16, 29, 0.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d0d12;
+      --surface: #15151c;
+      --border: #26262f;
+      --border-strong: #32323d;
+      --text: #f2f2f5;
+      --text-muted: #9b9bab;
+      --text-faint: #6e6e7e;
+      --accent: #8b85f5;
+      --accent-soft: #1d1b3a;
+      --danger: #f0776a;
+      --danger-soft: #2a1614;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 96px; }
+
+  header { margin-bottom: 28px; }
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    font-weight: 620;
+    letter-spacing: -0.02em;
+  }
+
+  .sub { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .search { position: relative; flex: 1 1 260px; }
+
+  .search svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+
+  input[type="search"] {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  input[type="search"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
+
+  button {
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  button:hover:not(:disabled) { border-color: var(--border-strong); }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  .count {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tr.row { cursor: pointer; transition: background 0.12s; }
+  tr.row:hover { background: var(--accent-soft); }
+  tr.row[aria-expanded="true"] { background: var(--accent-soft); }
+
+  .name { font-weight: 550; letter-spacing: -0.01em; }
+
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .muted { color: var(--text-muted); }
+  .faint { color: var(--text-faint); }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .chev {
+    display: inline-block;
+    color: var(--text-faint);
+    transition: transform 0.15s;
+  }
+
+  tr.row[aria-expanded="true"] .chev { transform: rotate(90deg); color: var(--accent); }
+
+  .detail td { padding: 0; background: var(--bg); }
+
+  .detail-inner {
+    padding: 18px 16px 20px 44px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px 28px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 3px;
+  }
+
+  .field-value { font-size: 14px; word-break: break-word; }
+
+  .state {
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .state strong { display: block; color: var(--text); margin-bottom: 4px; font-weight: 550; }
+
+  .state.error { color: var(--danger); background: var(--danger-soft); }
+  .state.error strong { color: var(--danger); }
+  .state code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+  }
+
+  .skel {
+    height: 13px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s infinite linear;
+  }
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  footer code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 28px 14px 64px; }
+    .hide-sm { display: none; }
+    .detail-inner { padding-left: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Patients</h1>
+    <p class="sub">Registered through the voice intake line.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+      </svg>
+      <input id="q" type="search" placeholder="Search by last name" autocomplete="off"
+             spellcheck="false" aria-label="Search by last name" />
+    </div>
+    <button id="refresh" type="button">Refresh</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:28px"></th>
+          <th>Name</th>
+          <th>Date of birth</th>
+          <th class="hide-sm">Sex</th>
+          <th>Phone</th>
+          <th class="hide-sm">Email</th>
+          <th class="hide-sm">Registered</th>
+        </tr>
+      </thead>
+      <tbody id="body"></tbody>
+    </table>
+    <div id="state" hidden></div>
+  </div>
+
+  <footer>Read-only view of <code id="api-label"></code></footer>
+</div>
+
+<script>
+// Served by the API itself, so same-origin by default.
+// Falls back to :8000 when opened from a standalone static server on :3000,
+// and ?api=http://host:port overrides both.
+const API = new URLSearchParams(location.search).get("api")
+  || (location.port === "3000" ? location.origin.replace(/:\d+$/, ":8000") : location.origin);
+
+const COLUMNS = 7;
+const body = document.getElementById("body");
+const stateEl = document.getElementById("state");
+const countEl = document.getElementById("count");
+const search = document.getElementById("q");
+const refresh = document.getElementById("refresh");
+document.getElementById("api-label").textContent = API;
+
+const addressCache = new Map();
+let expanded = null;
+let requestId = 0;
+
+const esc = (value) =>
+  String(value).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const dash = (value) => (value === null || value === undefined || value === ""
+  ? '<span class="faint">—</span>' : esc(value));
+
+function phone(value) {
+  if (!value) return dash(value);
+  const d = String(value);
+  return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : esc(d);
+}
+
+function shortDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.valueOf())
+    ? "—"
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function showState(html, isError) {
+  body.innerHTML = "";
+  stateEl.className = "state" + (isError ? " error" : "");
+  stateEl.innerHTML = html;
+  stateEl.hidden = false;
+}
+
+function showSkeleton() {
+  stateEl.hidden = true;
+  countEl.textContent = "";
+  body.innerHTML = Array.from({ length: 4 }, () =>
+    `<tr>${Array.from({ length: COLUMNS }, (_, i) =>
+      `<td><div class="skel" style="width:${i === 0 ? 14 : 55 + ((i * 13) % 40)}%"></div></td>`
+    ).join("")}</tr>`).join("");
+}
+
+async function getJSON(path) {
+  const response = await fetch(API + path, { headers: { Accept: "application/json" } });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(payload?.error?.message || `Request failed (${response.status})`);
+  }
+  return payload?.data;
+}
+
+function rowHTML(p) {
+  const name = `${p.first_name || ""} ${p.last_name || ""}`.trim();
+  return `
+    <tr class="row" data-id="${esc(p.patient_id)}" aria-expanded="false" tabindex="0">
+      <td><span class="chev">&#8250;</span></td>
+      <td class="name">${dash(name)}</td>
+      <td class="mono">${dash(p.date_of_birth)}</td>
+      <td class="hide-sm"><span class="pill">${dash(p.sex)}</span></td>
+      <td class="mono">${phone(p.phone_number)}</td>
+      <td class="hide-sm muted">${dash(p.email)}</td>
+      <td class="hide-sm muted mono">${esc(shortDate(p.created_at))}</td>
+    </tr>`;
+}
+
+function field(label, value) {
+  return `<div><div class="field-label">${esc(label)}</div>
+          <div class="field-value">${dash(value)}</div></div>`;
+}
+
+function detailHTML(p, address) {
+  // undefined = still fetching, null = no address on file.
+  const loading = address === undefined;
+  const addr = address || {};
+  const addrField = (label, key) =>
+    field(label, loading ? "Loading…" : (addr[key] ?? null));
+
+  const fields = [
+    field("Patient ID", p.patient_id),
+    field("Insurance", p.insurance_provider),
+    field("Member ID", p.insurance_member_id),
+    field("Emergency contact", p.emergency_contact_name),
+    field("Emergency phone", p.emergency_contact_phone
+      ? phone(p.emergency_contact_phone).replace(/<[^>]*>/g, "") : null),
+    field("Preferred language", p.preferred_language),
+    addrField("Address line 1", "address_line_1"),
+    addrField("Address line 2", "address_line_2"),
+    addrField("City", "city"),
+    addrField("State", "state"),
+    addrField("ZIP code", "zip_code"),
+  ].join("");
+  return `<tr class="detail"><td colspan="${COLUMNS}"><div class="detail-inner">${fields}</div></td></tr>`;
+}
+
+async function toggle(tr, patient) {
+  const isOpen = tr.getAttribute("aria-expanded") === "true";
+  document.querySelectorAll(".detail").forEach((el) => el.remove());
+  document.querySelectorAll('.row[aria-expanded="true"]')
+    .forEach((el) => el.setAttribute("aria-expanded", "false"));
+
+  if (isOpen) { expanded = null; return; }
+
+  expanded = patient.patient_id;
+  tr.setAttribute("aria-expanded", "true");
+  tr.insertAdjacentHTML("afterend", detailHTML(patient, addressCache.get(patient.patient_id)));
+
+  if (!addressCache.has(patient.patient_id)) {
+    // 404 simply means no address on file, which is a valid state.
+    const address = await getJSON(`/api/v1/patients/${patient.patient_id}/address`)
+      .catch(() => null);
+    addressCache.set(patient.patient_id, address ?? null);
+    if (expanded === patient.patient_id) {
+      const detail = tr.nextElementSibling;
+      if (detail?.classList.contains("detail")) {
+        detail.outerHTML = detailHTML(patient, addressCache.get(patient.patient_id));
+      }
+    }
+  }
+}
+
+function render(patients) {
+  if (!patients.length) {
+    showState(`<strong>No patients found</strong>${
+      search.value.trim() ? "Try a different last name." : "Registrations will appear here."}`);
+    return;
+  }
+
+  stateEl.hidden = true;
+  countEl.textContent = `${patients.length} patient${patients.length === 1 ? "" : "s"}`;
+  body.innerHTML = patients.map(rowHTML).join("");
+
+  const byId = new Map(patients.map((p) => [p.patient_id, p]));
+  body.querySelectorAll(".row").forEach((tr) => {
+    const patient = byId.get(tr.dataset.id);
+    tr.addEventListener("click", () => toggle(tr, patient));
+    tr.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(tr, patient); }
+    });
+  });
+}
+
+async function load() {
+  const id = ++requestId;
+  showSkeleton();
+  refresh.disabled = true;
+
+  const term = search.value.trim();
+  const query = term ? `?last_name=${encodeURIComponent(term)}&limit=200` : "?limit=200";
+
+  try {
+    const patients = await getJSON("/api/v1/patients" + query);
+    if (id === requestId) render(patients || []);
+  } catch (err) {
+    if (id === requestId) {
+      showState(`<strong>Could not reach the API</strong>${esc(err.message)}<br>
+                 <code>${esc(API)}</code>`, true);
+      countEl.textContent = "";
+    }
+  } finally {
+    if (id === requestId) refresh.disabled = false;
+  }
+}
+
+let debounce;
+search.addEventListener("input", () => {
+  clearTimeout(debounce);
+  debounce = setTimeout(load, 250);
+});
+refresh.addEventListener("click", load);
+load();
+</script>
+</body>
+</html>

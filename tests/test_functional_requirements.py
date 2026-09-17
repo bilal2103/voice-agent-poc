@@ -262,3 +262,47 @@ def test_emergencies_are_redirected_to_911_and_the_call_ends():
 def test_out_of_scope_refusal_is_stated_once_not_repeatedly():
     assert "without apologising repeatedly" in SYSTEM_PROMPT
     assert "If they then want to register or update, carry on as normal." in SYSTEM_PROMPT
+
+
+# --- webhook traffic ------------------------------------------------------
+
+
+def test_assistant_only_subscribes_to_messages_the_server_handles(assistant):
+    """Unsubscribed chatter (conversation-update, speech-update) is pure load.
+
+    Left at the default, a four-minute call sent ~170 webhooks the service
+    discards, which is enough to get real tool calls dropped in transit.
+    """
+    assert set(assistant["serverMessages"]) == {
+        "tool-calls",
+        "status-update",
+        "end-of-call-report",
+    }
+
+
+def test_server_messages_only_uses_values_vapi_accepts(assistant):
+    """Vapi rejects the whole assistant on an unknown value.
+
+    "assistant-request" in particular is not valid here: it is how Vapi asks for
+    this assistant, so it is configured on the phone number instead.
+    """
+    allowed = {
+        "conversation-update",
+        "end-of-call-report",
+        "function-call",
+        "hang",
+        "speech-update",
+        "status-update",
+        "tool-calls",
+        "transfer-destination-request",
+        "user-interrupted",
+    }
+    assert set(assistant["serverMessages"]) <= allowed
+
+
+def test_sex_options_are_never_read_aloud():
+    """Listing the values invites the caller to pick "Decline to Answer"."""
+    assert "Never read a list of options aloud" in SYSTEM_PROMPT
+    assert 'never say the words "Decline to Answer" to the caller' in SYSTEM_PROMPT
+    assert "Storing sex is separate from asking about it" in SYSTEM_PROMPT
+    assert "The caller never hears these labels" in SYSTEM_PROMPT
