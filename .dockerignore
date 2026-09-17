@@ -1,0 +1,27 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Never bake secrets into the image; compose injects them at runtime.
+.env
+*.env
+!.env.example
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+README.md

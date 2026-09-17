@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+
+# Logs / local data
+*.log
+logs/
+
+# Local database files (PostgreSQL runs in Docker or externally)
+*.sqlite
+*.sqlite3
+*.db
+
+# Secrets / credentials
+credentials.json
+*.pem
+*.key
+
+# Docker (local overrides; never commit machine-specific compose tweaks)
+docker-compose.override.yml
+
+# Editors / OS
+.vscode/
+.idea/
+.cursor/
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
